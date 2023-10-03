@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://j0svxtxgwfah"]
+
+[ext_resource type="PackedScene" uid="uid://dm22nogv4okg6" path="res://src/stages/test_map.tscn" id="1_x8if7"]
+[ext_resource type="PackedScene" uid="uid://chixspyx1aa40" path="res://src/entities/player.tscn" id="2_frop7"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_kaygo"]
+font_size = 8
+
+[node name="Main" type="Node2D"]
+
+[node name="Player" parent="." node_paths=PackedStringArray("debug_label") instance=ExtResource("2_frop7")]
+position = Vector2(-64, 236)
+debug_label = NodePath("Label")
+DASH_COULDOWN = 3.0
+metadata/_edit_group_ = true
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+zoom = Vector2(5, 5)
+position_smoothing_enabled = true
+drag_horizontal_enabled = true
+
+[node name="Label" type="Label" parent="Player"]
+z_index = 1
+offset_left = -31.0
+offset_top = -82.0
+offset_right = 32.0
+offset_bottom = -40.0
+label_settings = SubResource("LabelSettings_kaygo")
+
+[node name="Map" parent="." instance=ExtResource("1_x8if7")]
+position = Vector2(-110, 279)
