@@ -25,4 +25,4 @@ addons/*
 .DS_Store
 
 # Build folder
-builds/*
+build/*
