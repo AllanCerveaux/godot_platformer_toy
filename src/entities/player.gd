@@ -36,14 +36,6 @@ func _ready():
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
-	
-	if not is_on_floor() and is_on_wall_only() and DIRECTION != 0:
-		velocity.y /= 2
-	
-	if input.is_action_just_pressed("jump") and not is_on_floor() and is_on_wall_only():
-		DIRECTION *= -1
-		velocity.y = JUMP_VELOCITY
-		velocity.x = (SPEED) * DIRECTION
 
 	# Handle Jump.
 	if input.is_action_just_pressed("jump") and is_on_floor() and !input.is_action_pressed("ui_down"):
