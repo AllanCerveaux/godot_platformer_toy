@@ -9,7 +9,7 @@ extends CharacterBody2D
 @export var raycast_top_right: RayCast2D
 
 @export var SPEED: float = 300.0
-@export var ACCELERATION: float = 20.0
+@export var ACCELERATION: float = 10.0
 @export var JUMP_VELOCITY: float = -400.0
 @export var DASH_COULDOWN: float = 3.0
 
@@ -36,6 +36,14 @@ func _ready():
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
+	
+	if not is_on_floor() and is_on_wall_only() and DIRECTION != 0:
+		velocity.y /= 2
+	
+	if input.is_action_just_pressed("jump") and not is_on_floor() and is_on_wall_only():
+		DIRECTION *= -1
+		velocity.y = JUMP_VELOCITY
+		velocity.x = (SPEED) * DIRECTION
 
 	# Handle Jump.
 	if input.is_action_just_pressed("jump") and is_on_floor() and !input.is_action_pressed("ui_down"):
@@ -46,7 +54,7 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, DIRECTION * SPEED, ACCELERATION)
 	else:
 		velocity.x = move_toward(velocity.x, 0, 20)
-		
+	
 	debug_label.text = debug_text.format({
 		"SPEED": SPEED,
 		"X": velocity.x,
@@ -69,8 +77,7 @@ func _on_rotate_sprite() -> void:
 func _on_crouch_state() -> void:
 	var crouch_machine: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/crouch_machine/playback")
 	
-	collision_shape.shape = crouch_collision_shape
-	collision_shape.position.y = 31.0
+	switch_to_crouch_shape()
 	
 	if not input.is_action_pressed("move_down") and not (raycast_top_left.is_colliding() or raycast_top_right.is_colliding()):
 		crouch_machine.stop()
@@ -96,6 +103,7 @@ func _on_move_state() -> void:
 			"walk":
 				SPEED = 125
 			"dash":
+				velocity.y /= 2.5
 				_handle_dash(SPEED * 1.5, ACCELERATION + 60.0)
 				timer.start(DASH_COULDOWN)
 			_:
@@ -106,22 +114,16 @@ func _on_root_state() -> void:
 	debug_label.text = debug_label.text.format({
 		"ROOT_STATE": root_machine.get_current_node(),
 	})
-
-	collision_shape.shape = default_collision_shape
-	collision_shape.position.x = 0
-	collision_shape.position.y = 23.0
-	collision_shape.rotation_degrees = 0
-	
+	_handle_reset_collision_shape()
 	match  root_machine.get_current_node():
 		"idle":
 			SPEED = 300
 		"slide":
-			collision_shape.position.x = DIRECTION * 5
-			collision_shape.position.y = 36.0
-			collision_shape.rotation_degrees = DIRECTION * 90.0
+			switch_to_slide_shape()
 			
 			if(SPEED > 0):
 				SPEED -= 5
+			
 			_handle_dash(SPEED)
 		"move_machine":
 			_on_move_state()
@@ -130,3 +132,18 @@ func _on_root_state() -> void:
 
 func _handle_dash(speed: float, acceleration: float = ACCELERATION) -> void:
 	velocity.x = move_toward(velocity.x, speed * LAST_FACING, acceleration)
+	
+func _handle_reset_collision_shape() -> void:
+	_update_collision_shape(default_collision_shape, 0, 23.0, 0)
+
+func switch_to_slide_shape() -> void:
+	_update_collision_shape(default_collision_shape, DIRECTION * 5, 36.0, DIRECTION * 90.0)
+
+func switch_to_crouch_shape() -> void:
+	_update_collision_shape(crouch_collision_shape, 0, 31.0, 0)
+
+func _update_collision_shape(shape: CapsuleShape2D, x: float, y: float, rotation_degrees: float) -> void:
+	collision_shape.shape = shape
+	collision_shape.position.x = x
+	collision_shape.position.y = y
+	collision_shape.rotation_degrees = rotation_degrees
