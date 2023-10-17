@@ -7,6 +7,7 @@ extends CharacterBody2D
 @export var debug_label: Label
 @export var raycast_top_left: RayCast2D
 @export var raycast_top_right: RayCast2D
+@export var raycast_top: RayCast2D
 @export var raycast_bottom: RayCast2D
 
 @export var SPEED: float = 300.0
@@ -47,18 +48,10 @@ func _physics_process(delta: float) -> void:
 	if not is_on_wall() and is_on_floor() and not CAN_START_WALL_SLIDE:
 		CAN_START_WALL_SLIDE = true
 	
-	if is_on_wall() and not raycast_bottom.is_colliding():
+	if is_on_wall_only() and (raycast_top.is_colliding() and raycast_bottom.is_colliding()) and (input.is_action_pressed("move_left") or input.is_action_pressed("move_right")):
 		if wall_slide_timer.is_stopped() and CAN_START_WALL_SLIDE:
 			wall_slide_timer.start(1.0)
 			CAN_START_WALL_SLIDE = false
-		if input.is_action_just_pressed("jump"):
-			velocity.y = JUMP_VELOCITY
-			if sprite.flip_h:
-				sprite.set_flip_h(false)
-				velocity.x = SPEED
-			else:
-				sprite.set_flip_h(true)
-				velocity.x = -SPEED
 		elif wall_slide_timer.is_stopped():
 			velocity.y /= 2
 		else:
@@ -69,9 +62,10 @@ func _physics_process(delta: float) -> void:
 
 	DIRECTION = input.get_axis("move_left", "move_right")
 	if DIRECTION:
+		
 		velocity.x = move_toward(velocity.x, DIRECTION * SPEED, ACCELERATION)
 	else:
-		velocity.x = move_toward(velocity.x, 0, 20)
+		velocity.x = move_toward(velocity.x, 0, 50)
 	
 	debug_label.text = debug_text.format({
 		"SPEED": SPEED,
@@ -89,9 +83,15 @@ func _on_rotate_sprite() -> void:
 	if(DIRECTION < 0):
 		LAST_FACING = -1
 		sprite.set_flip_h(true)
+		raycast_top.set_rotation_degrees(180)
+		raycast_bottom.set_rotation_degrees(180)
 	elif(DIRECTION > 0):
 		LAST_FACING = 1
 		sprite.set_flip_h(false)
+		raycast_top.set_rotation_degrees(0)
+		raycast_bottom.set_rotation_degrees(0)
+		
+		
 
 func _on_crouch_state() -> void:
 	var crouch_machine: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/crouch_machine/playback")

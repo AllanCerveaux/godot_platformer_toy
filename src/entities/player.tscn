@@ -1,4 +1,4 @@
-[gd_scene load_steps=93 format=3 uid="uid://chixspyx1aa40"]
+[gd_scene load_steps=89 format=3 uid="uid://chixspyx1aa40"]
 
 [ext_resource type="Texture2D" uid="uid://c5sa1s2qtme57" path="res://src/entities/player.png" id="1_ba6r6"]
 [ext_resource type="Script" path="res://src/entities/player.gd" id="1_rkmm1"]
@@ -2639,9 +2639,6 @@ animation = &"slide"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_oh7if"]
 animation = &"wall_climb_idle"
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_wuany"]
-animation = &"wall_jump"
-
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_q872w"]
 animation = &"wall_slide"
 
@@ -2704,7 +2701,7 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8pgr8"]
 advance_mode = 2
-advance_expression = "is_on_wall()"
+advance_expression = "is_on_wall_only() and (raycast_top.is_colliding() and raycast_bottom.is_colliding())"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_duhpp"]
 advance_mode = 2
@@ -2712,26 +2709,14 @@ advance_expression = "not is_on_wall()"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_hp2iq"]
 advance_mode = 2
-advance_expression = "velocity.y > 0 and not CAN_START_WALL_SLIDE"
+advance_expression = "velocity.y > 0 and not CAN_START_WALL_SLIDE and not is_on_floor()"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_kgwh4"]
 advance_mode = 2
-advance_expression = "not is_on_wall()"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4mdua"]
-advance_mode = 2
-advance_expression = "input.is_action_just_pressed(\"jump\")"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_n7qer"]
-advance_mode = 2
-advance_expression = "input.is_action_just_pressed(\"jump\")"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_n21ej"]
-switch_mode = 2
-advance_mode = 2
+advance_expression = "not is_on_wall() or is_on_floor()"
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_7y4un"]
-states/Start/position = Vector2(324.333, 219)
+states/Start/position = Vector2(323.167, 319)
 states/crouch_machine/node = SubResource("AnimationNodeStateMachine_cuvge")
 states/crouch_machine/position = Vector2(69.833, 100.25)
 states/idle/node = SubResource("AnimationNodeAnimation_0aa4y")
@@ -2743,19 +2728,17 @@ states/land/position = Vector2(500.518, 100.25)
 states/look_up/node = SubResource("AnimationNodeAnimation_6r0rn")
 states/look_up/position = Vector2(500.255, 220.297)
 states/move_machine/node = SubResource("AnimationNodeStateMachine_4igbf")
-states/move_machine/position = Vector2(321.665, 9.32748)
+states/move_machine/position = Vector2(323.75, 9.61987)
 states/slide/node = SubResource("AnimationNodeAnimation_5xkde")
 states/slide/position = Vector2(70.2192, 9.56139)
 states/wall_climb_idle/node = SubResource("AnimationNodeAnimation_oh7if")
 states/wall_climb_idle/position = Vector2(322.333, -98.988)
-states/wall_jump/node = SubResource("AnimationNodeAnimation_wuany")
-states/wall_jump/position = Vector2(223.193, -221.945)
 states/wall_slide/node = SubResource("AnimationNodeAnimation_q872w")
 states/wall_slide/position = Vector2(122.693, -99.0955)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_pls1n"), "idle", "move_machine", SubResource("AnimationNodeStateMachineTransition_ovh02"), "move_machine", "idle", SubResource("AnimationNodeStateMachineTransition_4ogya"), "idle", "crouch_machine", SubResource("AnimationNodeStateMachineTransition_p76se"), "crouch_machine", "idle", SubResource("AnimationNodeStateMachineTransition_h45a8"), "idle", "jump", SubResource("AnimationNodeStateMachineTransition_qusm4"), "jump", "land", SubResource("AnimationNodeStateMachineTransition_heukw"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_812ak"), "move_machine", "jump", SubResource("AnimationNodeStateMachineTransition_eunx0"), "idle", "look_up", SubResource("AnimationNodeStateMachineTransition_j7415"), "look_up", "idle", SubResource("AnimationNodeStateMachineTransition_uilck"), "move_machine", "slide", SubResource("AnimationNodeStateMachineTransition_0hfeh"), "slide", "crouch_machine", SubResource("AnimationNodeStateMachineTransition_e22rt"), "jump", "wall_climb_idle", SubResource("AnimationNodeStateMachineTransition_8pgr8"), "wall_climb_idle", "move_machine", SubResource("AnimationNodeStateMachineTransition_duhpp"), "wall_climb_idle", "wall_slide", SubResource("AnimationNodeStateMachineTransition_hp2iq"), "wall_slide", "move_machine", SubResource("AnimationNodeStateMachineTransition_kgwh4"), "wall_slide", "wall_jump", SubResource("AnimationNodeStateMachineTransition_4mdua"), "wall_climb_idle", "wall_jump", SubResource("AnimationNodeStateMachineTransition_n7qer"), "wall_jump", "wall_slide", SubResource("AnimationNodeStateMachineTransition_n21ej")]
-graph_offset = Vector2(-159.307, -279.945)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_pls1n"), "idle", "move_machine", SubResource("AnimationNodeStateMachineTransition_ovh02"), "move_machine", "idle", SubResource("AnimationNodeStateMachineTransition_4ogya"), "idle", "crouch_machine", SubResource("AnimationNodeStateMachineTransition_p76se"), "crouch_machine", "idle", SubResource("AnimationNodeStateMachineTransition_h45a8"), "idle", "jump", SubResource("AnimationNodeStateMachineTransition_qusm4"), "jump", "land", SubResource("AnimationNodeStateMachineTransition_heukw"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_812ak"), "move_machine", "jump", SubResource("AnimationNodeStateMachineTransition_eunx0"), "idle", "look_up", SubResource("AnimationNodeStateMachineTransition_j7415"), "look_up", "idle", SubResource("AnimationNodeStateMachineTransition_uilck"), "move_machine", "slide", SubResource("AnimationNodeStateMachineTransition_0hfeh"), "slide", "crouch_machine", SubResource("AnimationNodeStateMachineTransition_e22rt"), "jump", "wall_climb_idle", SubResource("AnimationNodeStateMachineTransition_8pgr8"), "wall_climb_idle", "move_machine", SubResource("AnimationNodeStateMachineTransition_duhpp"), "wall_climb_idle", "wall_slide", SubResource("AnimationNodeStateMachineTransition_hp2iq"), "wall_slide", "move_machine", SubResource("AnimationNodeStateMachineTransition_kgwh4")]
+graph_offset = Vector2(-437.182, -166.065)
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "animation_player", "animation_tree", "collision_shape", "raycast_top_left", "raycast_top_right", "raycast_bottom")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "animation_player", "animation_tree", "collision_shape", "raycast_top_left", "raycast_top_right", "raycast_top", "raycast_bottom")]
 script = ExtResource("1_rkmm1")
 sprite = NodePath("Sprite2D")
 animation_player = NodePath("AnimationPlayer")
@@ -2763,6 +2746,7 @@ animation_tree = NodePath("AnimationTree")
 collision_shape = NodePath("CollisionShape2D")
 raycast_top_left = NodePath("Raycast_Top_Left_Sensor")
 raycast_top_right = NodePath("Raycast_Top_Right_Sensor")
+raycast_top = NodePath("Raycast_Top_Sensor")
 raycast_bottom = NodePath("Raycast_Bottom_Sensor")
 DASH_COULDOWN = 0.001
 
@@ -2771,7 +2755,7 @@ texture_filter = 1
 texture = ExtResource("1_ba6r6")
 hframes = 14
 vframes = 14
-frame = 3
+frame = 5
 metadata/_aseprite_wizard_config_ = {
 "keep_anim_length": false,
 "layer": "player",
@@ -2813,6 +2797,10 @@ position = Vector2(-6, 34)
 target_position = Vector2(0, -25)
 metadata/_edit_lock_ = true
 
+[node name="Raycast_Top_Sensor" type="RayCast2D" parent="."]
+position = Vector2(0, 5)
+target_position = Vector2(12, 0)
+
 [node name="Raycast_Bottom_Sensor" type="RayCast2D" parent="."]
-position = Vector2(0, 42)
-target_position = Vector2(0, 20)
+position = Vector2(0, 40)
+target_position = Vector2(12, 0)
